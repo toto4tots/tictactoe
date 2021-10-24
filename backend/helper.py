@@ -19,3 +19,5 @@ def has_won(board):
 
     return [False, None]
 
+def get_best_move(board):
+    pass

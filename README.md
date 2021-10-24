@@ -5,8 +5,14 @@ Basic Rules
    * The program should announce the result of the game before clearing the board for 
      another round of play.
 
+## Getting Started
+```
+export FLASK_APP=flaskr
+export FLASK_ENV=development
+flask run
+```
 
-### Testing
+## Testing
 To run tests
 ```
 pytest tests.py
