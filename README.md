@@ -12,6 +12,8 @@ export FLASK_ENV=development
 flask run
 ```
 
+## Guarentee Win or Draw for P2
+
 ## Testing
 To run tests
 ```

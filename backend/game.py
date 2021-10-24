@@ -6,3 +6,7 @@ class Game:
             [None, None, None],
             [None, None, None],
         ]
+
+        # cache for get_best_move()
+        self.win_map = {}
+    
