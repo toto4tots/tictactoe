@@ -21,3 +21,6 @@ def has_won(board):
 
 def get_best_move(board):
     pass
+
+def is_valid(val):
+    return val != None and val >= 0 and val < 3
