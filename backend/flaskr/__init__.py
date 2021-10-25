@@ -2,10 +2,12 @@
 from flask import Flask, jsonify, request
 from game import Game
 from helper import is_valid, get_best_move, has_won
+from flask_cors import CORS
 #TODO Add proper errors
 
 def create_app():
     app = Flask(__name__)
+    CORS(app)
     game = Game()
 
     @app.route('/board', methods=['POST'])
