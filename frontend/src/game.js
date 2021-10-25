@@ -8,7 +8,8 @@ export const Game = () => {
             mode: "cors"
         })
     }, [])
-    const [board, setBoard] = useState([[null, null, null], [null, null, null], [null, null, null]]) 
+    const [board, setBoard] = useState([[null, null, null], [null, null, null], [null, null, null]]); 
+    const [gameFinished, setGameFinished] = useState(false);
 
     const handleClick = (e) => {
         const strIndex = e.target.getAttribute('name');
@@ -16,13 +17,37 @@ export const Game = () => {
         updateBoard(index)
     }
 
-    const updateBoard = ([i, j]) => {
-        let temp = board.map(a => { return { ...a } });
-        if (temp[i][j] === null) {
-            temp[i][j] = "X";
+    const updateBoard = (index) => {
+        if (!gameFinished) {
+            fetch("http://localhost:5000/board", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    "move": index
+                }),
+                mode: "cors"
+            })
+                .then(response => response.json())
+                .then(response => {
+                    const [i, j] = index;
+                    let temp = board.map(a => { return { ...a } });
+                    if (temp[i][j] === null) {
+                        temp[i][j] = "X";
+                        let player2 = response["player2"]
+                        if (player2) {
+                            temp[player2[0]][player2[1]] = "O";
+                        }
+                    }
+                    setBoard(temp);
+                    setGameFinished(response["gameFinished"]);
+
+                })
+                .catch((e) => {
+                    console.error(e)
+                })
         }
-    
-        setBoard(temp) 
     }
 
     let rows = [
