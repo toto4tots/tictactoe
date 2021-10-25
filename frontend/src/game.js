@@ -1,24 +1,48 @@
 import React, { useState, useEffect } from "react";
 
+const FIRST_MESSAGE = "You can go first";
+
 export const Game = () => {
-    useEffect(() => {
+    const reset = () => {
+        // reset the backend
         fetch("http://localhost:5000/reset", {
             method: "POST",
-            headers: { "Content-Type": "application/json"},
+            headers: { "Content-Type": "application/json" },
             mode: "cors"
         })
+    }
+
+    useEffect(() => {
+        reset();
     }, [])
+
     const [board, setBoard] = useState([[null, null, null], [null, null, null], [null, null, null]]); 
     const [gameFinished, setGameFinished] = useState(false);
+    const [message, setMessage] = useState(FIRST_MESSAGE);
+    const [resetMessage, setResetMessage] = useState("");
 
     const handleClick = (e) => {
         const strIndex = e.target.getAttribute('name');
-        const index = [+strIndex.charAt(0), +strIndex.charAt(1)]        
-        updateBoard(index)
+        const index = [+strIndex.charAt(0), +strIndex.charAt(1)];
+        updateBoard(index); 
+    }
+
+    const handleReset = () => {
+        setResetMessage("Starting over...");
+        setTimeout(() => { globalReset() }, 3000);
+    }
+
+    const globalReset = () => {
+        reset();
+        setBoard([[null, null, null], [null, null, null], [null, null, null]]);
+        setGameFinished(false);
+        setMessage(FIRST_MESSAGE);
+        setResetMessage("");
     }
 
     const updateBoard = (index) => {
         if (!gameFinished) {
+            setMessage("");
             fetch("http://localhost:5000/board", {
                 method: "POST",
                 headers: {
@@ -41,8 +65,13 @@ export const Game = () => {
                         }
                     }
                     setBoard(temp);
-                    setGameFinished(response["gameFinished"]);
-
+                    if (response["gameFinished"]) {
+                        setGameFinished(response["gameFinished"]);
+                        if ("message" in response) {
+                            setMessage(response["message"]);
+                        }
+                        handleReset();
+                    }
                 })
                 .catch((e) => {
                     console.error(e)
@@ -83,6 +112,10 @@ export const Game = () => {
                     </tr>
                 </tbody>
             </table>
+            {message}
+            <div>
+                {resetMessage}
+            </div>
         </div>
     )
 }

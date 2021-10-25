@@ -28,7 +28,8 @@ def create_app():
                         return jsonify({
                             'success': True,
                             'gameFinished': True,
-                            'player2': [player2[0], player2[1]]
+                            'player2': [player2[0], player2[1]],
+                            'message': "You lost"
                         })
                     else:
                         # something weird happened
@@ -41,7 +42,8 @@ def create_app():
                     return jsonify({
                         'success': True,
                         'gameFinished': True,
-                        'player2': None
+                        'player2': None,
+                        'message': "It's a draw"
                     })
 
                 # The game has not finished
