@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 
-const FIRST_MESSAGE = "You can go first";
-
 export const Game = () => {
     const reset = () => {
         // reset the backend
@@ -17,32 +15,49 @@ export const Game = () => {
     }, [])
 
     const [board, setBoard] = useState([[null, null, null], [null, null, null], [null, null, null]]); 
-    const [gameFinished, setGameFinished] = useState(false);
-    const [message, setMessage] = useState(FIRST_MESSAGE);
-    const [resetMessage, setResetMessage] = useState("");
+    const [tempBoard, setTempBoard] = useState(null); 
+    const [responseData, setResponseData] = useState(null);
+    const [message, setMessage] = useState("");
+    const [currentPlayer, setCurrentPlayer] = useState(1);
 
-    const handleClick = (e) => {
-        const strIndex = e.target.getAttribute('name');
-        const index = [+strIndex.charAt(0), +strIndex.charAt(1)];
-        updateBoard(index); 
-    }
+    useEffect(() => {
+        if (tempBoard && responseData && "player2" in responseData) {
+            if (responseData["player2"] != null) {
+                setCurrentPlayer(2);
+                setTimeout(() => {
+                    let copy = tempBoard.map(a => { return { ...a } });
+                    const [x, y] = responseData["player2"];
+                    copy[x][y] = "O";
+                    setBoard(copy);
+                    if (!responseData["gameFinished"]) {
+                        setCurrentPlayer(1);
+                    }
+                }, 1000)
+            }
+        }
 
-    const handleReset = () => {
-        setResetMessage("Starting over...");
-        setTimeout(() => { globalReset() }, 3000);
-    }
+    }, [responseData, tempBoard])
 
-    const globalReset = () => {
-        reset();
-        setBoard([[null, null, null], [null, null, null], [null, null, null]]);
-        setGameFinished(false);
-        setMessage(FIRST_MESSAGE);
-        setResetMessage("");
-    }
+    useEffect(() => {
+        const globalReset = () => {
+            reset()
+            setBoard([[null, null, null], [null, null, null], [null, null, null]])
+            setTempBoard(null);
+            setResponseData(null);
+            setMessage("");
+            setCurrentPlayer(1);
+        }
+        if (tempBoard && responseData && responseData["gameFinished"]) {
+            alert(responseData["message"]);
+            setMessage("Starting Over...");
+            setCurrentPlayer(null);
+            setTimeout(() => { globalReset() }, 3000)
+        }
+    }, [responseData, tempBoard])
 
     const updateBoard = (index) => {
-        if (!gameFinished) {
-            setMessage("");
+        setResponseData(null);
+        if (currentPlayer === 1) {
             fetch("http://localhost:5000/board", {
                 method: "POST",
                 headers: {
@@ -59,24 +74,21 @@ export const Game = () => {
                     let temp = board.map(a => { return { ...a } });
                     if (temp[i][j] === null) {
                         temp[i][j] = "X";
-                        let player2 = response["player2"]
-                        if (player2) {
-                            temp[player2[0]][player2[1]] = "O";
-                        }
-                    }
+                        setTempBoard(temp)
+                    };
                     setBoard(temp);
-                    if (response["gameFinished"]) {
-                        setGameFinished(response["gameFinished"]);
-                        if ("message" in response) {
-                            setMessage(response["message"]);
-                        }
-                        handleReset();
-                    }
+                    setResponseData(response);
                 })
                 .catch((e) => {
-                    console.error(e)
+                    console.error(e);
                 })
         }
+    }    
+
+    const handleClick = (e) => {
+        const strIndex = e.target.getAttribute('name');
+        const index = [+strIndex.charAt(0), +strIndex.charAt(1)];
+        updateBoard(index);
     }
 
     let rows = [
@@ -112,9 +124,8 @@ export const Game = () => {
                     </tr>
                 </tbody>
             </table>
-            {message}
             <div>
-                {resetMessage}
+                {message}
             </div>
         </div>
     )

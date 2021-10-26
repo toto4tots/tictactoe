@@ -1,9 +1,9 @@
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, abort
 from game import Game
 from helper import is_valid, get_best_move, has_won
 from flask_cors import CORS
-#TODO Add proper errors
+from constants import DRAW_MESSAGE, LOST_MESSAGE, INVALID_MOVE
 
 def create_app():
     app = Flask(__name__)
@@ -29,13 +29,11 @@ def create_app():
                             'success': True,
                             'gameFinished': True,
                             'player2': [player2[0], player2[1]],
-                            'message': "You lost"
+                            'message': LOST_MESSAGE
                         })
                     else:
                         # something weird happened
-                        return jsonify({
-                            'success': False
-                        })
+                        abort(422)
                 # draw
                 elif all(c is not None for row in game.board for c in row):
                     game.finished = True
@@ -43,7 +41,7 @@ def create_app():
                         'success': True,
                         'gameFinished': True,
                         'player2': None,
-                        'message': "It's a draw"
+                        'message': DRAW_MESSAGE
                     })
 
                 # The game has not finished
@@ -53,9 +51,8 @@ def create_app():
                     'gameFinished': False,
                     'player2': [player2[0], player2[1]]
                 })
-            return jsonify({
-                'success': False
-            })
+            # invalid move
+            abort(422, description=INVALID_MOVE)
         else:
             # game is finished
             # do nothing
@@ -74,6 +71,13 @@ def create_app():
         return jsonify({
             'success': True
         })
+    
+    @app.errorhandler(422)
+    def unprocessable(error):
+        return jsonify({
+            'error': 422,
+            'message': error.description
+        }), 422
     
     return app
 
