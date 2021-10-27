@@ -6,7 +6,8 @@ Basic Rules
      another round of play.
 
 ## Getting Started
-Both the frontend and backend must be running <br />
+This program uses React and JS in the frontend and Flask and Python in the backend.<br />
+Both the frontend and backend must be running to play the game.<br />
 Frontend
 ```
 cd frontend

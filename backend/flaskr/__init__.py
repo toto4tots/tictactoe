@@ -51,6 +51,7 @@ def create_app():
                     'gameFinished': False,
                     'player2': [player2[0], player2[1]]
                 })
+
             # invalid move
             return jsonify({
                 'success': False,
