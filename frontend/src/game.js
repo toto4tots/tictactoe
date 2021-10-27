@@ -21,24 +21,6 @@ export const Game = () => {
     const [currentPlayer, setCurrentPlayer] = useState(1);
 
     useEffect(() => {
-        if (tempBoard && responseData && "player2" in responseData) {
-            if (responseData["player2"] != null) {
-                setCurrentPlayer(2);
-                setTimeout(() => {
-                    let copy = tempBoard.map(a => { return { ...a } });
-                    const [x, y] = responseData["player2"];
-                    copy[x][y] = "O";
-                    setBoard(copy);
-                    if (!responseData["gameFinished"]) {
-                        setCurrentPlayer(1);
-                    }
-                }, 1000)
-            }
-        }
-
-    }, [responseData, tempBoard])
-
-    useEffect(() => {
         const globalReset = () => {
             reset()
             setBoard([[null, null, null], [null, null, null], [null, null, null]])
@@ -46,14 +28,35 @@ export const Game = () => {
             setResponseData(null);
             setMessage("");
             setCurrentPlayer(1);
-        }
-        if (tempBoard && responseData && responseData["gameFinished"]) {
+        };
+
+        const gameOver = () => {
             alert(responseData["message"]);
             setMessage("Starting Over...");
             setCurrentPlayer(null);
-            setTimeout(() => { globalReset() }, 3000)
+            setTimeout(() => { globalReset() }, 3000)  
+        };
+
+        if (tempBoard && responseData && "player2" in responseData) {
+            if (responseData["player2"] != null) {
+                setCurrentPlayer(2);
+                // mark the "O" 
+                setTimeout(() => {
+                    let copy = tempBoard.map(a => { return { ...a } });
+                    const [x, y] = responseData["player2"];
+                    copy[x][y] = "O";
+                    setBoard(copy);
+                    if (!responseData["gameFinished"]) {
+                        setCurrentPlayer(1);
+                    } else {
+                        gameOver();
+                    }               
+                }, 300);
+            } else if (responseData["gameFinished"]) {
+                gameOver();
+            } 
         }
-    }, [responseData, tempBoard])
+    }, [responseData, tempBoard]);
 
     const updateBoard = (index) => {
         setResponseData(null);
@@ -74,7 +77,7 @@ export const Game = () => {
                     let temp = board.map(a => { return { ...a } });
                     if (temp[i][j] === null) {
                         temp[i][j] = "X";
-                        setTempBoard(temp)
+                        setTempBoard(temp);
                     };
                     setBoard(temp);
                     setResponseData(response);
@@ -124,7 +127,7 @@ export const Game = () => {
                     </tr>
                 </tbody>
             </table>
-            <div>
+            <div className="game-text">
                 {message}
             </div>
         </div>

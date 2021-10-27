@@ -52,7 +52,10 @@ def create_app():
                     'player2': [player2[0], player2[1]]
                 })
             # invalid move
-            abort(422, description=INVALID_MOVE)
+            return jsonify({
+                'success': False,
+                'gameFinished': False,
+            })
         else:
             # game is finished
             # do nothing
