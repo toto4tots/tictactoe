@@ -73,14 +73,16 @@ export const Game = () => {
             })
                 .then(response => response.json())
                 .then(response => {
-                    const [i, j] = index;
-                    let temp = board.map(a => { return { ...a } });
-                    if (temp[i][j] === null) {
-                        temp[i][j] = "X";
-                        setTempBoard(temp);
-                    };
-                    setBoard(temp);
-                    setResponseData(response);
+                    if (response["success"]) {
+                        const [i, j] = index;
+                        let temp = board.map(a => { return { ...a } });
+                        if (temp[i][j] === null) {
+                            temp[i][j] = "X";
+                            setTempBoard(temp);
+                        };
+                        setBoard(temp);
+                        setResponseData(response);
+                    }
                 })
                 .catch((e) => {
                     console.error(e);
