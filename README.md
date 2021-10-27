@@ -17,7 +17,7 @@ npm start
 Backend
 ```
 cd backend
-pip3 install requirements.txt
+pip3 install -r requirements.txt
 export FLASK_APP=flaskr
 flask run
 ```
